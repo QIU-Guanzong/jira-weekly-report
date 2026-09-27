@@ -19,9 +19,10 @@ def summarize(payload, start, end):
     if start >= end:
         raise ValueError("The reporting interval must have positive length")
     issues = payload["issues"]
-    if payload.get("total", len(issues)) != len(issues):
+    if type(payload.get("total")) is not int or payload["total"] != len(issues):
         raise ValueError("Incomplete issue export: retrieve all pages first")
     seen, completed, statuses, hours, issue_hours = set(), [], Counter(), Counter(), {}
+    logged_tasks = []
     for issue in issues:
         key, fields = issue["key"], issue["fields"]
         if key in seen:
@@ -41,8 +42,10 @@ def summarize(payload, start, end):
                 }
             )
         worklogs = fields.get("worklog")
-        if worklogs is None or worklogs.get("total") != len(
-            worklogs.get("worklogs", [])
+        if (
+            worklogs is None
+            or type(worklogs.get("total")) is not int
+            or worklogs["total"] != len(worklogs.get("worklogs", []))
         ):
             raise ValueError(f"Incomplete worklogs for {key}: retrieve all pages first")
         ids, seconds = set(), 0
@@ -62,6 +65,15 @@ def summarize(payload, start, end):
                 # This is logged work, not inferred from assignment or lifetime totals.
                 hours[timestamp(log["started"]).strftime("%Y-%m-%d")] += duration / 3600
         issue_hours[key] = seconds / 3600
+        if seconds:
+            logged_tasks.append(
+                {
+                    "key": key,
+                    "summary": fields["summary"],
+                    "status": status,
+                    "hours": seconds / 3600,
+                }
+            )
     day = start.replace(hour=0, minute=0, second=0, microsecond=0)
     while day < end:
         hours.setdefault(day.strftime("%Y-%m-%d"), 0.0)
@@ -73,6 +85,7 @@ def summarize(payload, start, end):
         "completed": sorted(completed, key=lambda x: x["key"]),
         "hours": dict(sorted(hours.items())),
         "issue_hours": issue_hours,
+        "logged_tasks": sorted(logged_tasks, key=lambda row: row["key"]),
         "total_hours": sum(issue_hours.values()),
     }
 
@@ -86,6 +99,7 @@ def write_pdf(payload, metrics, start, end, destination):
         Spacer,
         Table,
         TableStyle,
+        PageBreak,
     )
     from reportlab.graphics.shapes import Drawing, Rect, String
 
@@ -291,6 +305,50 @@ def write_pdf(payload, metrics, start, end, destination):
             "SmallCustom",
         ),
     ]
+
+    story += [
+        PageBreak(),
+        p("Time spent on tasks", "TitleCustom"),
+        p(f"{start:%d %b %Y} to {end:%d %b %Y} (end exclusive, UTC)", "SmallCustom"),
+        p(
+            "Every task with work logged in this period, including unfinished work. "
+            "Status is the current export snapshot. Hours are rounded to one decimal.",
+            "SmallCustom",
+        ),
+        Spacer(1, 18),
+    ]
+    status_labels = {"new": "To do", "indeterminate": "In progress", "done": "Done"}
+    logged_rows = [
+        [p(label, "SmallCustom") for label in ("Issue", "Task", "Status", "Hours")]
+    ]
+    for task in metrics["logged_tasks"]:
+        logged_rows.append(
+            [
+                p(task["key"]),
+                p(task["summary"]),
+                p(status_labels[task["status"]]),
+                p(f"{task['hours']:.1f}"),
+            ]
+        )
+    if not metrics["logged_tasks"]:
+        logged_rows.append([p("-"), p("No worklogs in this period."), p("-"), p("0.0")])
+    logged_rows.append([p("Total"), p(""), p(""), p(f"{metrics['total_hours']:.1f}")])
+    logged_table = Table(
+        logged_rows, colWidths=[95, 265, 95, 55], repeatRows=1, hAlign="LEFT"
+    )
+    logged_table.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LINEBELOW", (0, 0), (-1, 0), 0.7, colors.HexColor(ink)),
+                ("LINEBELOW", (0, 1), (-1, -1), 0.3, colors.HexColor("#DFE4E1")),
+                ("LINEABOVE", (0, -1), (-1, -1), 0.7, colors.HexColor(ink)),
+                ("TOPPADDING", (0, 0), (-1, -1), 7),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+            ]
+        )
+    )
+    story.append(logged_table)
 
     def footer(canvas, doc):
         canvas.setFont("Helvetica", 8)

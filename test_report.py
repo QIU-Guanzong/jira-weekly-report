@@ -17,6 +17,35 @@ class ReportTests(unittest.TestCase):
         self.assertEqual((m["total"], m["done"], len(m["completed"])), (8, 4, 3))
         self.assertEqual(m["total_hours"], 25.5)
 
+    def test_missing_total_is_not_a_complete_export(self):
+        del self.payload["total"]
+        with self.assertRaisesRegex(ValueError, "Incomplete issue"):
+            summarize(self.payload, START, END)
+
+    def test_boolean_and_noninteger_totals_are_rejected(self):
+        for invalid in (True, 8.0, "8", -1):
+            with self.subTest(total=invalid):
+                self.payload["total"] = invalid
+                with self.assertRaisesRegex(ValueError, "Incomplete issue"):
+                    summarize(self.payload, START, END)
+
+    def test_all_logged_tasks_reconcile_including_unfinished_work(self):
+        m = summarize(self.payload, START, END)
+        self.assertEqual(sum(row["hours"] for row in m["logged_tasks"]), 25.5)
+        completed = {item["key"] for item in m["completed"]}
+        self.assertTrue(any(row["key"] not in completed for row in m["logged_tasks"]))
+        self.assertTrue(all(row["hours"] > 0 for row in m["logged_tasks"]))
+        self.assertEqual(
+            len(m["logged_tasks"]), len({r["key"] for r in m["logged_tasks"]})
+        )
+
+    def test_one_worklog_cannot_have_boolean_total(self):
+        issue = self.payload["issues"][1]
+        self.assertEqual(len(issue["fields"]["worklog"]["worklogs"]), 1)
+        issue["fields"]["worklog"]["total"] = True
+        with self.assertRaisesRegex(ValueError, "Incomplete worklogs"):
+            summarize(self.payload, START, END)
+
     def test_start_included_end_excluded_and_timezone_normalized(self):
         issue = self.payload["issues"][0]
         issue["fields"]["worklog"] = {

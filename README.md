@@ -8,13 +8,19 @@ been connected to a client Jira instance, scheduled, or accepted by a client.
 
 ![Synthetic weekly report preview](examples/weekly-report.png)
 
+The second page itemizes every task with work logged during the week, including
+in-progress and to-do tasks. Its total reconciles with the overview; completed
+tasks remain a separate section. Long task lists continue with repeated headers.
+
+![Synthetic task-hours detail](examples/task-hours.png)
+
 ## Run
 
 Requires Python 3.11+.
 
 ```sh
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m unittest -v
 .venv/bin/python report.py sample.json \
   --start 2026-09-21T00:00:00Z --end 2026-09-28T00:00:00Z \
@@ -30,7 +36,7 @@ arrived. Deployment/scheduling needs the client's target environment and approva
 `sample.json` shows the shape. Use a complete export of the agreed sprint/scope,
 not just issues updated this week: that would bias the sprint denominator. Each
 issue needs key, summary, status category, resolution date and complete worklogs.
-The outer `total` and each worklog `total` must match the actual records. The
+The outer `total` and each worklog `total` must be explicit integers matching the actual records. The
 program rejects partial pages and duplicates instead of undercounting silently.
 The caller must also ensure permission-filtered exports represent the intended
 scope; counts cannot detect records hidden by Jira permissions.
@@ -57,4 +63,5 @@ fixtures. This demonstration did not access real customer data.
 
 The PDF uses built-in Latin fonts; CJK/other script font embedding would be a
 separate confirmed layout requirement. Public proposal claims are limited to the
-included implementation and six tests. Developed with AI assistance.
+included implementation and 13 tests, including actual PDF extraction for empty,
+normal and 60-task multi-page reports. Developed with AI assistance.
