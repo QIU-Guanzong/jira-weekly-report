@@ -1,0 +1,177 @@
+{
+  "synthetic": true,
+  "project": "Weekly delivery review",
+  "scope": "Illustrative sprint / 8 fictional issues / snapshot 27 Sep 2026",
+  "total": 8,
+  "issues": [
+    {
+      "key": "REPORT-101",
+      "fields": {
+        "summary": "Fix duplicate retry notifications",
+        "status": {
+          "statusCategory": {
+            "key": "done"
+          }
+        },
+        "resolutiondate": "2026-09-23T16:00:00Z",
+        "worklog": {
+          "total": 2,
+          "worklogs": [
+            {
+              "id": "100",
+              "started": "2026-09-21T09:00:00Z",
+              "timeSpentSeconds": 21600
+            },
+            {
+              "id": "old",
+              "started": "2026-09-18T10:00:00Z",
+              "timeSpentSeconds": 36000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "REPORT-102",
+      "fields": {
+        "summary": "Validate offline database generation",
+        "status": {
+          "statusCategory": {
+            "key": "done"
+          }
+        },
+        "resolutiondate": "2026-09-24T16:00:00Z",
+        "worklog": {
+          "total": 1,
+          "worklogs": [
+            {
+              "id": "101",
+              "started": "2026-09-22T09:00:00Z",
+              "timeSpentSeconds": 19800
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "REPORT-103",
+      "fields": {
+        "summary": "Add clear error states to export flow",
+        "status": {
+          "statusCategory": {
+            "key": "done"
+          }
+        },
+        "resolutiondate": "2026-09-25T16:00:00Z",
+        "worklog": {
+          "total": 1,
+          "worklogs": [
+            {
+              "id": "102",
+              "started": "2026-09-23T09:00:00Z",
+              "timeSpentSeconds": 14400
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "REPORT-104",
+      "fields": {
+        "summary": "Document setup and handover",
+        "status": {
+          "statusCategory": {
+            "key": "done"
+          }
+        },
+        "resolutiondate": "2026-09-18T16:00:00Z",
+        "worklog": {
+          "total": 0,
+          "worklogs": []
+        }
+      }
+    },
+    {
+      "key": "REPORT-105",
+      "fields": {
+        "summary": "Review CSV parsing edge cases",
+        "status": {
+          "statusCategory": {
+            "key": "indeterminate"
+          }
+        },
+        "resolutiondate": null,
+        "worklog": {
+          "total": 1,
+          "worklogs": [
+            {
+              "id": "104",
+              "started": "2026-09-25T09:00:00Z",
+              "timeSpentSeconds": 18000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "REPORT-106",
+      "fields": {
+        "summary": "Complete keyboard navigation checks",
+        "status": {
+          "statusCategory": {
+            "key": "indeterminate"
+          }
+        },
+        "resolutiondate": null,
+        "worklog": {
+          "total": 1,
+          "worklogs": [
+            {
+              "id": "105",
+              "started": "2026-09-21T09:00:00Z",
+              "timeSpentSeconds": 10800
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "REPORT-107",
+      "fields": {
+        "summary": "Draft integration checklist",
+        "status": {
+          "statusCategory": {
+            "key": "new"
+          }
+        },
+        "resolutiondate": null,
+        "worklog": {
+          "total": 1,
+          "worklogs": [
+            {
+              "id": "106",
+              "started": "2026-09-22T09:00:00Z",
+              "timeSpentSeconds": 7200
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "REPORT-108",
+      "fields": {
+        "summary": "Schedule release review",
+        "status": {
+          "statusCategory": {
+            "key": "new"
+          }
+        },
+        "resolutiondate": null,
+        "worklog": {
+          "total": 0,
+          "worklogs": []
+        }
+      }
+    }
+  ]
+}

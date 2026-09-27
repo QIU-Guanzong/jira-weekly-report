@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+*.pyc
+.env
+weekly-report.pdf
+!examples/weekly-report.pdf
